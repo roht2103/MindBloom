@@ -14,6 +14,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +24,7 @@ export default function SignupPage() {
     }
     setLoading(true);
     setError('');
+    setSuccessMessage('');
 
     if (isMock) {
       setTimeout(() => {
@@ -48,6 +50,12 @@ export default function SignupPage() {
           return;
         }
 
+        if (!data?.session) {
+          setSuccessMessage('Verification email sent! Please check your inbox and verify your email to log in.');
+          setLoading(false);
+          return;
+        }
+
         setLoading(false);
         updateProfile({ name, email, role: 'none' });
         router.push('/onboarding/role');
@@ -67,7 +75,7 @@ export default function SignupPage() {
         <Link href="/">Mindbloom</Link>
       </div>
 
-      <div className="w-full max-w-[420px] glass-card p-8 rounded-lg shadow-xl">
+      <div className="w-full max-w-[420px] glass-card p-8 rounded-[4px] shadow-xl">
         <div className="text-center mb-8">
           <h1 className="font-display text-2xl font-bold text-foreground">Create Account</h1>
           <p className="font-sans text-sm text-on-surface-variant mt-2">
@@ -76,63 +84,71 @@ export default function SignupPage() {
         </div>
 
         {error && (
-          <div className="p-3 bg-error-container text-on-error-container text-xs rounded-lg mb-6 border border-error/25 font-sans">
+          <div className="p-3 bg-error-container text-on-error-container text-xs rounded-[4px] mb-6 border border-error/25 font-sans">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div className="flex flex-col gap-1.5">
-            <label className="font-sans text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
-              Your Name
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Alex Rivera"
-              className="w-full px-4 py-3 bg-surface-container-low text-foreground border border-outline-variant rounded-lg font-sans text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-            />
+        {successMessage && (
+          <div className="p-4 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs rounded-[4px] mb-6 border border-emerald-500/25 font-sans font-medium">
+            {successMessage}
           </div>
+        )}
 
-          <div className="flex flex-col gap-1.5">
-            <label className="font-sans text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
-              Email Address
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="alex@example.com"
-              className="w-full px-4 py-3 bg-surface-container-low text-foreground border border-outline-variant rounded-lg font-sans text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-            />
-          </div>
+        {!successMessage && (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <div className="flex flex-col gap-1.5">
+              <label className="font-sans text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                Your Name
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Alex Rivera"
+                className="w-full px-4 py-3 bg-surface-container-low text-foreground border border-outline-variant rounded-[4px] font-sans text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+              />
+            </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="font-sans text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Min. 8 characters"
-              className="w-full px-4 py-3 bg-surface-container-low text-foreground border border-outline-variant rounded-lg font-sans text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-            />
-          </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="font-sans text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                Email Address
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="alex@example.com"
+                className="w-full px-4 py-3 bg-surface-container-low text-foreground border border-outline-variant rounded-[4px] font-sans text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full pill-button-primary py-3.5 mt-2 rounded-lg font-sans text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-          >
-            {loading ? (
-              <span className="w-5 h-5 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></span>
-            ) : (
-              'Create Account'
-            )}
-          </button>
-        </form>
+            <div className="flex flex-col gap-1.5">
+              <label className="font-sans text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Min. 8 characters"
+                className="w-full px-4 py-3 bg-surface-container-low text-foreground border border-outline-variant rounded-[4px] font-sans text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full pill-button-primary py-3.5 mt-2 rounded-[4px] font-sans text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              {loading ? (
+                <span className="w-5 h-5 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></span>
+              ) : (
+                'Create Account'
+              )}
+            </button>
+          </form>
+        )}
 
         <div className="text-center mt-8 text-xs text-on-surface-variant font-sans">
           Already have an account?{' '}

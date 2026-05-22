@@ -87,7 +87,7 @@ export default function MoodPage() {
       
       {/* 1. Isolation Forest / Anomaly Alert Message Banner */}
       {trendAlert.isAnomaly && (
-        <div className={`p-4 border rounded-lg flex items-start gap-3.5 ${
+        <div className={`p-4 border rounded-[4px] flex items-start gap-3.5 ${
           trendAlert.severity === 'critical' 
             ? 'bg-red-500/10 border-red-500/20 text-red-700 dark:text-red-400' 
             : 'bg-orange-500/10 border-orange-500/20 text-orange-700 dark:text-orange-400'
@@ -127,7 +127,7 @@ export default function MoodPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Left Side: Check-in Form */}
-        <section className="lg:col-span-7 bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-6 shadow-sm">
+        <section className="lg:col-span-7 bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-6 shadow-sm">
           <h2 className="text-lg font-display font-bold text-on-surface mb-5">Log Your Mental State</h2>
           
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -149,7 +149,7 @@ export default function MoodPage() {
                 step="1"
                 value={moodValue}
                 onChange={(e) => setMoodValue(parseInt(e.target.value))}
-                className="w-full h-2 bg-surface-container-high rounded-lg appearance-none cursor-pointer accent-primary"
+                className="w-full h-2 bg-surface-container-high rounded-[4px] appearance-none cursor-pointer accent-primary"
               />
               <div className="flex justify-between text-[10px] text-on-surface-variant font-bold px-1">
                 <span>Distressed (1)</span>
@@ -173,7 +173,7 @@ export default function MoodPage() {
                   step="0.5"
                   value={sleepHours}
                   onChange={(e) => setSleepHours(parseFloat(e.target.value))}
-                  className="w-full h-2 bg-surface-container-high rounded-lg appearance-none cursor-pointer accent-primary"
+                  className="w-full h-2 bg-surface-container-high rounded-[4px] appearance-none cursor-pointer accent-primary"
                 />
                 <div className="flex justify-between text-[10px] text-on-surface-variant font-bold px-1">
                   <span>4h</span>
@@ -195,7 +195,7 @@ export default function MoodPage() {
                   step="1"
                   value={focusScore}
                   onChange={(e) => setFocusScore(parseInt(e.target.value))}
-                  className="w-full h-2 bg-surface-container-high rounded-lg appearance-none cursor-pointer accent-tertiary"
+                  className="w-full h-2 bg-surface-container-high rounded-[4px] appearance-none cursor-pointer accent-tertiary"
                 />
                 <div className="flex justify-between text-[10px] text-on-surface-variant font-bold px-1">
                   <span>Distracted (1)</span>
@@ -216,7 +216,7 @@ export default function MoodPage() {
                       type="button"
                       key={tag}
                       onClick={() => handleTagToggle(tag)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer select-none ${
+                      className={`px-3 py-1.5 rounded-[4px] text-xs font-bold border transition-colors cursor-pointer select-none ${
                         isSelected 
                           ? 'bg-primary/10 border-primary text-primary' 
                           : 'bg-surface border-outline-variant/15 text-on-surface-variant hover:border-outline'
@@ -237,12 +237,12 @@ export default function MoodPage() {
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="What happened today? How did you respond to stressful moments? Write anything you want..."
                 rows={3}
-                className="w-full bg-surface border border-outline-variant/30 rounded-lg p-3 text-xs focus:outline-none focus:border-primary placeholder-on-surface-variant/40 leading-relaxed font-medium"
+                className="w-full bg-surface border border-outline-variant/30 rounded-[4px] p-3 text-xs focus:outline-none focus:border-primary placeholder-on-surface-variant/40 leading-relaxed font-medium"
               />
             </div>
 
             {/* Real-time calculated stress preview */}
-            <div className="bg-surface border border-outline-variant/15 p-4 rounded-lg flex items-center justify-between">
+            <div className="bg-surface border border-outline-variant/15 p-4 rounded-[4px] flex items-center justify-between">
               <div>
                 <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Estimated Stress Index</p>
                 <p className="text-sm font-extrabold text-secondary mt-0.5">{previewStressDesc}</p>
@@ -256,7 +256,7 @@ export default function MoodPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full inline-flex items-center justify-center bg-primary text-on-primary hover:bg-primary/95 py-3 rounded-lg text-xs font-bold shadow-md shadow-primary/15 transition-all cursor-pointer"
+              className="w-full inline-flex items-center justify-center bg-primary text-on-primary hover:bg-primary/95 py-3 rounded-[4px] text-xs font-bold shadow-md shadow-primary/15 transition-all cursor-pointer"
             >
               <span className="material-symbols-outlined text-[18px] mr-2">send</span>
               Save Daily Entry
@@ -275,7 +275,7 @@ export default function MoodPage() {
         <div className="lg:col-span-5 space-y-6">
           
           {/* Stress Heatmap Grid */}
-          <section className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-5 shadow-sm">
+          <section className="bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-5 shadow-sm">
             <h3 className="text-sm font-display font-bold text-on-surface mb-3 flex items-center justify-between">
               <span>Stress Heatmap</span>
               <span className="text-[10px] text-on-surface-variant font-semibold">Last 28 Days</span>
@@ -327,7 +327,7 @@ export default function MoodPage() {
           </section>
 
           {/* Recent History Stream */}
-          <section className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-5 shadow-sm max-h-[360px] overflow-y-auto flex flex-col">
+          <section className="bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-5 shadow-sm max-h-[360px] overflow-y-auto flex flex-col">
             <h3 className="text-sm font-display font-bold text-on-surface mb-3">Logs History</h3>
             <div className="space-y-3.5 flex-1 overflow-y-auto">
               {checkins.length === 0 ? (

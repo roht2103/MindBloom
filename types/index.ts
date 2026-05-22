@@ -73,4 +73,6 @@ export interface UserProfile {
   level: number;
   streak: number;
   notificationsEnabled: boolean;
+  earnedBadges?: string[];
+  completedChallenges?: string[];
 }

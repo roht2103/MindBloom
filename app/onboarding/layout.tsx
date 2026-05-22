@@ -2,7 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useMindBloom } from '@/components/ui/mindbloom-provider';
 
 export default function OnboardingLayout({
   children,
@@ -10,6 +11,31 @@ export default function OnboardingLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, isLoading } = useMindBloom();
+
+  React.useEffect(() => {
+    if (!isLoading && !user) {
+      router.push('/auth/login');
+    }
+  }, [user, isLoading, router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+        <div className="flex flex-col items-center gap-4">
+          <span className="material-symbols-outlined text-[48px] text-primary animate-spin">
+            progress_activity
+          </span>
+          <p className="text-sm font-semibold text-on-surface-variant">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   // Determine current step percentage for a 3-step onboarding flow
   let progress = 33;
@@ -40,7 +66,7 @@ export default function OnboardingLayout({
             <span>{progress}%</span>
           </div>
           {/* Progress bar container (satisfies 4px rounding) */}
-          <div className="w-full h-1.5 bg-surface-container rounded-lg overflow-hidden">
+          <div className="w-full h-1.5 bg-surface-container rounded-[4px] overflow-hidden">
             <div
               className="h-full bg-primary transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}

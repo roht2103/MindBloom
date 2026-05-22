@@ -63,7 +63,7 @@ export default function ChatPage() {
   return (
     <div className="h-[calc(100vh-140px)] flex flex-col lg:flex-row gap-6 animate-in fade-in duration-500">
       {/* 1. Mascot Profile & Sentiment Dashboard (Left/Top) */}
-      <aside className="w-full lg:w-[280px] bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-5 flex flex-col gap-5 shrink-0 justify-between">
+      <aside className="w-full lg:w-[280px] bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-5 flex flex-col gap-5 shrink-0 justify-between">
         <div className="space-y-5">
           {/* Mascot Info */}
           <div className="text-center pb-4 border-b border-outline-variant/15">
@@ -82,7 +82,7 @@ export default function ChatPage() {
             <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block">
               Companion Sentiment Analyzer
             </span>
-            <div className="bg-surface border border-outline-variant/15 p-3 rounded-lg flex items-center gap-3">
+            <div className="bg-surface border border-outline-variant/15 p-3 rounded-[4px] flex items-center gap-3">
               <span className="material-symbols-outlined text-primary text-[20px] animate-pulse">
                 insights
               </span>
@@ -94,7 +94,7 @@ export default function ChatPage() {
           </div>
 
           {/* Secure & Private Indicator */}
-          <div className="bg-secondary/5 border border-secondary/15 p-3 rounded-lg space-y-1.5">
+          <div className="bg-secondary/5 border border-secondary/15 p-3 rounded-[4px] space-y-1.5">
             <div className="flex items-center gap-2 text-secondary">
               <span className="material-symbols-outlined text-[16px]">security</span>
               <span className="text-[11px] font-bold">Confidential Space</span>
@@ -108,7 +108,7 @@ export default function ChatPage() {
         {/* Clear chat command */}
         <button
           onClick={clearChat}
-          className="w-full flex items-center justify-center gap-1.5 border border-red-500/20 hover:bg-red-500/5 text-red-500 hover:text-red-600 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-colors"
+          className="w-full flex items-center justify-center gap-1.5 border border-red-500/20 hover:bg-red-500/5 text-red-500 hover:text-red-600 py-2 rounded-[4px] text-xs font-semibold cursor-pointer transition-colors"
         >
           <span className="material-symbols-outlined text-[16px]">delete_sweep</span>
           Clear Chat History
@@ -116,7 +116,7 @@ export default function ChatPage() {
       </aside>
 
       {/* 2. Interactive Chat Window (Center/Main) */}
-      <section className="flex-1 bg-surface-container-lowest border border-outline-variant/20 rounded-lg flex flex-col overflow-hidden">
+      <section className="flex-1 bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] flex flex-col overflow-hidden">
         {/* Chat header info */}
         <header className="px-5 py-3 border-b border-outline-variant/15 flex items-center justify-between shrink-0 bg-surface/40">
           <div className="flex items-center gap-2.5">
@@ -152,7 +152,7 @@ export default function ChatPage() {
                 {/* Message block */}
                 <div className="space-y-1.5">
                   <div
-                    className={`p-3.5 rounded-lg text-xs leading-relaxed font-medium shadow-sm border ${
+                    className={`p-3.5 rounded-[4px] text-xs leading-relaxed font-medium shadow-sm border ${
                       isUser
                         ? 'bg-secondary text-on-secondary border-secondary/10'
                         : 'bg-surface border-outline-variant/20 text-on-surface'
@@ -179,7 +179,7 @@ export default function ChatPage() {
               >
                 🌱
               </div>
-              <div className="bg-surface border border-outline-variant/25 px-4 py-3 rounded-lg flex items-center gap-1.5">
+              <div className="bg-surface border border-outline-variant/25 px-4 py-3 rounded-[4px] flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce duration-300 delay-75" style={{ borderRadius: '50%' }}></span>
                 <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce duration-300 delay-150" style={{ borderRadius: '50%' }}></span>
                 <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce duration-300 delay-225" style={{ borderRadius: '50%' }}></span>
@@ -196,7 +196,7 @@ export default function ChatPage() {
               <button
                 key={prompt}
                 onClick={() => handleSendMessage(prompt)}
-                className="text-[11px] font-bold text-primary bg-primary/5 hover:bg-primary/10 border border-primary/15 px-3 py-1.5 rounded-lg cursor-pointer whitespace-nowrap transition-colors"
+                className="text-[11px] font-bold text-primary bg-primary/5 hover:bg-primary/10 border border-primary/15 px-3 py-1.5 rounded-[4px] cursor-pointer whitespace-nowrap transition-colors"
               >
                 {prompt}
               </button>
@@ -212,12 +212,12 @@ export default function ChatPage() {
             onKeyDown={handleKeyPress}
             placeholder="Share what's on your mind... (Press Enter to send)"
             rows={1}
-            className="flex-1 bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-primary placeholder-on-surface-variant/50 resize-none max-h-24 leading-relaxed font-medium"
+            className="flex-1 bg-surface-container-lowest border border-outline-variant/30 rounded-[4px] px-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-primary placeholder-on-surface-variant/50 resize-none max-h-24 leading-relaxed font-medium"
           />
           <button
             onClick={() => handleSendMessage(inputText)}
             disabled={!inputText.trim() || isTyping}
-            className="w-10 h-10 bg-primary text-on-primary rounded-lg flex items-center justify-center shadow-md shadow-primary/15 hover:bg-primary/95 disabled:bg-primary/50 disabled:shadow-none shrink-0 transition-all select-none cursor-pointer"
+            className="w-10 h-10 bg-primary text-on-primary rounded-[4px] flex items-center justify-center shadow-md shadow-primary/15 hover:bg-primary/95 disabled:bg-primary/50 disabled:shadow-none shrink-0 transition-all select-none cursor-pointer"
           >
             <span className="material-symbols-outlined text-[20px]">send</span>
           </button>

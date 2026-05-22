@@ -52,7 +52,7 @@ export default function GamificationPage() {
       </section>
 
       {/* Level & XP Gauge */}
-      <section className="bg-gradient-to-br from-primary-container/20 to-primary/10 border border-primary-container/20 rounded-lg p-6 shadow-sm">
+      <section className="bg-gradient-to-br from-primary-container/20 to-primary/10 border border-primary-container/20 rounded-[4px] p-6 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div 
@@ -88,7 +88,7 @@ export default function GamificationPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Left: Badges showcase */}
-        <section className="lg:col-span-7 bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-6 shadow-sm">
+        <section className="lg:col-span-7 bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-6 shadow-sm">
           <h3 className="text-base font-display font-bold text-on-surface mb-4">Earned Badges</h3>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -96,14 +96,14 @@ export default function GamificationPage() {
               <div 
                 key={badge.id}
                 onClick={() => !badge.earned && handleTestEarnBadge(badge.id, badge.name)}
-                className={`p-4 border rounded-lg flex items-start gap-3.5 transition-all select-none ${
+                className={`p-4 border rounded-[4px] flex items-start gap-3.5 transition-all select-none ${
                   badge.earned 
                     ? 'bg-surface border-primary/20 shadow-sm cursor-default' 
                     : 'bg-surface-container-low/40 border-outline-variant/15 opacity-60 hover:opacity-80 hover:border-outline cursor-pointer'
                 }`}
               >
                 <div 
-                  className={`w-12 h-12 flex items-center justify-center text-xl border rounded-lg shrink-0 ${
+                  className={`w-12 h-12 flex items-center justify-center text-xl border rounded-[4px] shrink-0 ${
                     badge.earned 
                       ? 'bg-primary/10 border-primary/20 text-primary' 
                       : 'bg-surface-container-high border-outline-variant/30 text-on-surface-variant'
@@ -136,7 +136,7 @@ export default function GamificationPage() {
         <div className="lg:col-span-5 space-y-6">
           
           {/* Streak tracker visualizer */}
-          <section className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-5 shadow-sm">
+          <section className="bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-5 shadow-sm">
             <div className="flex justify-between items-start">
               <div>
                 <h3 className="text-sm font-display font-bold text-on-surface">Streak Tracker</h3>
@@ -151,7 +151,7 @@ export default function GamificationPage() {
               {[...Array(5)].map((_, i) => (
                 <div 
                   key={i}
-                  className={`w-10 h-12 rounded-lg border flex flex-col items-center justify-center transition-all ${
+                  className={`w-10 h-12 rounded-[4px] border flex flex-col items-center justify-center transition-all ${
                     i < profile.streak 
                       ? 'bg-orange-500/10 border-orange-500/35 text-orange-600' 
                       : 'bg-surface border-outline-variant/15 text-on-surface-variant'
@@ -170,11 +170,11 @@ export default function GamificationPage() {
           </section>
 
           {/* XP Rewards shop */}
-          <section className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-5 shadow-sm space-y-4">
+          <section className="bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-5 shadow-sm space-y-4">
             <h3 className="text-sm font-display font-bold text-on-surface">XP Rewards Shop</h3>
             
             {redeemedReward && (
-              <div className="p-3 bg-secondary/15 border border-secondary/20 text-secondary text-xs font-bold rounded-lg text-center animate-bounce">
+              <div className="p-3 bg-secondary/15 border border-secondary/20 text-secondary text-xs font-bold rounded-[4px] text-center animate-bounce">
                 Claimed: {redeemedReward}! Reward unlocked.
               </div>
             )}
@@ -185,7 +185,7 @@ export default function GamificationPage() {
                 return (
                   <div 
                     key={reward.id} 
-                    className="border border-outline-variant/15 p-3 rounded-lg flex items-center justify-between gap-3 bg-surface/30"
+                    className="border border-outline-variant/15 p-3 rounded-[4px] flex items-center justify-between gap-3 bg-surface/30"
                   >
                     <div className="min-w-0">
                       <h4 className="text-xs font-bold text-on-surface truncate flex items-center gap-1.5">
@@ -198,7 +198,7 @@ export default function GamificationPage() {
                     </div>
                     <button
                       onClick={() => handleClaimReward(reward.name, reward.cost)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold cursor-pointer shrink-0 transition-colors ${
+                      className={`px-3 py-1.5 rounded-[4px] text-[10px] font-bold cursor-pointer shrink-0 transition-colors ${
                         canAfford 
                           ? 'bg-secondary text-on-secondary hover:bg-secondary/95 shadow-sm' 
                           : 'bg-surface-container-high text-on-surface-variant/40 cursor-not-allowed border border-outline-variant/10'

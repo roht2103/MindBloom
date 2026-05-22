@@ -12,10 +12,12 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     age INTEGER,
     marital_status TEXT,
     intentions TEXT[] DEFAULT '{}',
-    xp INTEGER DEFAULT 120,
+    xp INTEGER DEFAULT 0,
     level INTEGER DEFAULT 1,
-    streak INTEGER DEFAULT 3,
+    streak INTEGER DEFAULT 0,
     notifications_enabled BOOLEAN DEFAULT TRUE,
+    earned_badges TEXT[] DEFAULT '{}',
+    completed_challenges TEXT[] DEFAULT '{}',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
@@ -30,16 +32,18 @@ CREATE POLICY "Users can insert own profile" ON public.profiles FOR INSERT WITH 
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO public.profiles (id, name, email, role, xp, level, streak, notifications_enabled)
+    INSERT INTO public.profiles (id, name, email, role, xp, level, streak, notifications_enabled, earned_badges, completed_challenges)
     VALUES (
         new.id,
         COALESCE(new.raw_user_meta_data->>'name', 'Anonymous User'),
         new.email,
         'none',
-        120,
+        0,
         1,
-        3,
-        TRUE
+        0,
+        TRUE,
+        '{}',
+        '{}'
     );
     RETURN NEW;
 END;

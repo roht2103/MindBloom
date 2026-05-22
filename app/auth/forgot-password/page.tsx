@@ -34,7 +34,7 @@ export default function ForgotPasswordPage() {
         <Link href="/">Mindbloom</Link>
       </div>
 
-      <div className="w-full max-w-[420px] glass-card p-8 rounded-lg shadow-xl">
+      <div className="w-full max-w-[420px] glass-card p-8 rounded-[4px] shadow-xl">
         <div className="text-center mb-8">
           <h1 className="font-display text-2xl font-bold text-foreground">Reset Password</h1>
           <p className="font-sans text-sm text-on-surface-variant mt-2">
@@ -43,14 +43,14 @@ export default function ForgotPasswordPage() {
         </div>
 
         {error && (
-          <div className="p-3 bg-error-container text-on-error-container text-xs rounded-lg mb-6 border border-error/25 font-sans">
+          <div className="p-3 bg-error-container text-on-error-container text-xs rounded-[4px] mb-6 border border-error/25 font-sans">
             {error}
           </div>
         )}
 
         {success ? (
           <div className="text-center font-sans">
-            <div className="w-16 h-16 bg-secondary/15 text-secondary flex items-center justify-center rounded-lg mx-auto mb-6">
+            <div className="w-16 h-16 bg-secondary/15 text-secondary flex items-center justify-center rounded-[4px] mx-auto mb-6">
               <span className="material-symbols-outlined text-[36px]">mail</span>
             </div>
             <h3 className="text-lg font-bold text-foreground mb-2">Check Your Email</h3>
@@ -58,7 +58,7 @@ export default function ForgotPasswordPage() {
               If an account exists for <strong>{email}</strong>, we have sent instructions to reset your password.
             </p>
             <Link href="/auth/login">
-              <button className="w-full pill-button-primary py-3 rounded-lg font-sans text-sm font-semibold cursor-pointer">
+              <button className="w-full pill-button-primary py-3 rounded-[4px] font-sans text-sm font-semibold cursor-pointer">
                 Back to Sign In
               </button>
             </Link>
@@ -74,14 +74,14 @@ export default function ForgotPasswordPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="alex@example.com"
-                className="w-full px-4 py-3 bg-surface-container-low text-foreground border border-outline-variant rounded-lg font-sans text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                className="w-full px-4 py-3 bg-surface-container-low text-foreground border border-outline-variant rounded-[4px] font-sans text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full pill-button-primary py-3.5 mt-2 rounded-lg font-sans text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full pill-button-primary py-3.5 mt-2 rounded-[4px] font-sans text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {loading ? (
                 <span className="w-5 h-5 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></span>

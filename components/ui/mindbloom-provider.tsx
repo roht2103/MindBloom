@@ -20,6 +20,8 @@ interface MindBloomContextType {
   posts: Post[];
   addPost: (content: string) => void;
   reactToPost: (postId: string, reactionType: 'hugs' | 'support' | 'calm') => void;
+  user: any;
+  isLoading: boolean;
 }
 
 const MindBloomContext = createContext<MindBloomContextType | undefined>(undefined);
@@ -39,69 +41,52 @@ const initialProfile: UserProfile = {
   gender: '',
   intentions: [],
   challenges: [],
-  xp: 120,
+  xp: 0,
   level: 1,
-  streak: 3,
-  notificationsEnabled: true
+  streak: 0,
+  notificationsEnabled: true,
+  earnedBadges: [],
+  completedChallenges: []
 };
-
-const initialCheckins: MoodCheckin[] = [
-  { id: '1', value: 7, note: 'Had a productive morning study session.', date: '2026-05-16', timestamp: '2026-05-16T09:00:00Z', tags: ['Productive', 'Calm'], sleepHours: 7.5, focusScore: 8, stressLevel: 3 },
-  { id: '2', value: 6, note: 'Felt a bit overwhelmed by the afternoon meetings.', date: '2026-05-17', timestamp: '2026-05-17T17:00:00Z', tags: ['Tired', 'Overwhelmed'], sleepHours: 6, focusScore: 6, stressLevel: 5 },
-  { id: '3', value: 8, note: 'Great run in the evening. Sleep was amazing.', date: '2026-05-18', timestamp: '2026-05-18T08:30:00Z', tags: ['Energetic', 'Grateful'], sleepHours: 8.5, focusScore: 9, stressLevel: 2 },
-  { id: '4', value: 5, note: 'Struggling to focus on coding projects today.', date: '2026-05-19', timestamp: '2026-05-19T14:15:00Z', tags: ['Anxious', 'Distracted'], sleepHours: 5, focusScore: 5, stressLevel: 6 },
-  { id: '5', value: 7, note: 'Meditation helped stabilize my focus.', date: '2026-05-20', timestamp: '2026-05-20T10:00:00Z', tags: ['Focused', 'Peaceful'], sleepHours: 7, focusScore: 8, stressLevel: 3 },
-  { id: '6', value: 6, note: 'Decent day, but feeling the end-of-week burnout.', date: '2026-05-21', timestamp: '2026-05-21T18:30:00Z', tags: ['Tired'], sleepHours: 6.5, focusScore: 7, stressLevel: 4 },
-];
 
 const initialChallenges: Challenge[] = [
   { id: 'c1', title: 'Daily Mood Log', description: 'Check in your emotional state to maintain awareness.', xpReward: 20, completed: false, category: 'daily' },
   { id: 'c2', title: 'Calm Breathing Guide', description: 'Complete a 3-minute paced breathing exercise.', xpReward: 30, completed: false, category: 'daily' },
   { id: 'c3', title: 'Connect with Companion', description: 'Chat with your AI Companion for positive reflection.', xpReward: 25, completed: false, category: 'daily' },
-  { id: 'c4', title: 'Share Encouragement', description: 'Post an uplifting comment or thought on the Community board.', xpReward: 40, completed: false, category: 'weekly' },
   { id: 'c5', title: 'Consistent Sleep Streak', description: 'Log sleep >= 7 hours for 3 check-ins.', xpReward: 50, completed: false, category: 'weekly' }
 ];
 
 const initialBadges: Badge[] = [
-  { id: 'b1', name: 'First Check-in', description: 'Logged your very first mood on MindBloom.', icon: 'spa', earned: true, earnedDate: '2026-05-16' },
+  { id: 'b1', name: 'First Check-in', description: 'Logged your very first mood on MindBloom.', icon: 'spa', earned: false },
   { id: 'b2', name: 'Mindfulness Master', description: 'Completed 5 breathing or zen grounding exercises.', icon: 'self_improvement', earned: false },
-  { id: 'b3', name: 'Stress Warrior', description: 'Achieved a relaxed stress rating of 2 or below.', icon: 'shield_moon', earned: true, earnedDate: '2026-05-18' },
-  { id: 'b4', name: 'Community Beacon', description: 'Contributed 3 support notes to fellow users.', icon: 'forum', earned: false },
+  { id: 'b3', name: 'Stress Warrior', description: 'Achieved a relaxed stress rating of 2 or below.', icon: 'shield_moon', earned: false },
   { id: 'b5', name: '7-Day Streak', description: 'Logged in and checked in for 7 days in a row.', icon: 'local_fire_department', earned: false }
 ];
 
-const initialPosts: Post[] = [
-  {
-    id: 'p1',
-    author: 'Elena Vance',
-    role: 'Student',
-    content: "Finals week is finally over! Sending calm vibes to anyone who is still testing. Remember to breathe and step away from the desk. You've got this!",
-    timestamp: '3 hours ago',
-    reactions: { hugs: 12, support: 8, calm: 15 },
-    comments: [
-      { id: 'c1_1', author: 'Markus D.', content: 'Thank you for this! Needed to hear it today.', timestamp: '2 hours ago' }
-    ]
-  },
-  {
-    id: 'p2',
-    author: 'Ryan Howard',
-    role: 'Professional',
-    content: 'Just started using the paced breathing bubble here. It is surprising how much just 3 minutes of focused breathing can lower my heart rate after a tough client call.',
-    timestamp: 'Yesterday',
-    reactions: { hugs: 5, support: 14, calm: 9 },
-    comments: []
-  }
-];
-
 export function MindBloomProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [profile, setProfile] = useState<UserProfile>(initialProfile);
-  const [checkins, setCheckins] = useState<MoodCheckin[]>(initialCheckins);
+  const [checkins, setCheckins] = useState<MoodCheckin[]>([]);
   const [messages, setMessages] = useState<Message[]>([
     { id: 'm_init', role: 'assistant', content: "Hello! I'm your MindBloom wellness companion. How has your day been? Feel free to share whatever is on your mind, or let me know if you want to try a grounding exercise.", timestamp: new Date().toISOString() }
   ]);
-  const [challenges, setChallenges] = useState<Challenge[]>(initialChallenges);
-  const [badges, setBadges] = useState<Badge[]>(initialBadges);
-  const [posts, setPosts] = useState<Post[]>(initialPosts);
+  const [posts, setPosts] = useState<Post[]>([]);
+
+  // Compute challenges and badges dynamically from profile
+  const challenges: Challenge[] = initialChallenges.map(c => ({
+    ...c,
+    completed: profile.completedChallenges?.includes(c.id) || false
+  }));
+
+  const badges: Badge[] = initialBadges.map(b => {
+    const earned = profile.earnedBadges?.includes(b.id) || false;
+    return {
+      ...b,
+      earned,
+      earnedDate: earned ? new Date().toISOString().split('T')[0] : undefined
+    };
+  });
 
   const syncWithBackend = async (authToken?: string) => {
     try {
@@ -139,7 +124,7 @@ export function MindBloomProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      // 4. Fetch Community Posts
+      // 4. Fetch Community Posts (no-op since removed, but keep stub to avoid breaking API)
       const postRes = await fetch(`${API_BASE_URL}/api/community`, { headers });
       if (postRes.ok) {
         const postData = await postRes.json();
@@ -157,36 +142,44 @@ export function MindBloomProvider({ children }: { children: React.ReactNode }) {
       const savedProfile = localStorage.getItem('mb_profile');
       const savedCheckins = localStorage.getItem('mb_checkins');
       const savedMessages = localStorage.getItem('mb_messages');
-      const savedChallenges = localStorage.getItem('mb_challenges');
-      const savedBadges = localStorage.getItem('mb_badges');
       const savedPosts = localStorage.getItem('mb_posts');
 
       if (savedProfile) setProfile(JSON.parse(savedProfile));
       if (savedCheckins) setCheckins(JSON.parse(savedCheckins));
       if (savedMessages) setMessages(JSON.parse(savedMessages));
-      if (savedChallenges) setChallenges(JSON.parse(savedChallenges));
-      if (savedBadges) setBadges(JSON.parse(savedBadges));
       if (savedPosts) setPosts(JSON.parse(savedPosts));
     }
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
+      setUser(session?.user || null);
+      setIsLoading(false);
       if (session?.access_token) {
         await syncWithBackend(session.access_token);
       } else if (event === 'SIGNED_OUT') {
         setProfile(initialProfile);
-        setCheckins(initialCheckins);
+        setCheckins([]);
         setMessages([
           { id: 'm_init', role: 'assistant', content: "Hello! I'm your MindBloom wellness companion. How has your day been? Feel free to share whatever is on your mind, or let me know if you want to try a grounding exercise.", timestamp: new Date().toISOString() }
         ]);
-        setChallenges(initialChallenges);
-        setBadges(initialBadges);
-        setPosts(initialPosts);
+        setPosts([]);
         localStorage.clear();
       }
     });
 
+    const initSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+      if (session?.access_token) {
+        await syncWithBackend(session.access_token);
+      }
+      setIsLoading(false);
+    };
+
     if (isMock) {
       syncWithBackend('mock-token');
+      setIsLoading(false);
+    } else {
+      initSession();
     }
 
     return () => {
@@ -261,23 +254,31 @@ export function MindBloomProvider({ children }: { children: React.ReactNode }) {
 
     // Award XP for mood checking
     let xpGain = 20;
-    const moodLogChallenge = challenges.find(c => c.id === 'c1');
-    if (moodLogChallenge && !moodLogChallenge.completed) {
-      setChallenges(prevC => {
-        const updatedC = prevC.map(c => c.id === 'c1' ? { ...c, completed: true } : c);
-        localStorage.setItem('mb_challenges', JSON.stringify(updatedC));
-        return updatedC;
-      });
-      xpGain += moodLogChallenge.xpReward;
+    const completedChallenges = [...(profile.completedChallenges || [])];
+    if (!completedChallenges.includes('c1')) {
+      completedChallenges.push('c1');
+      const moodLogChallenge = initialChallenges.find(c => c.id === 'c1');
+      if (moodLogChallenge) {
+        xpGain += moodLogChallenge.xpReward;
+      }
     }
 
-    if (stressVal <= 2) {
-      earnBadge('b3');
+    const earnedBadges = [...(profile.earnedBadges || [])];
+    if (stressVal <= 2 && !earnedBadges.includes('b3')) {
+      earnedBadges.push('b3');
     }
+    if (!earnedBadges.includes('b1')) {
+      earnedBadges.push('b1');
+    }
+
+    const nextXp = profile.xp + xpGain;
+    const nextLevel = Math.floor(nextXp / 200) + 1;
 
     updateProfile({
-      xp: profile.xp + xpGain,
-      level: Math.floor((profile.xp + xpGain) / 200) + 1,
+      completedChallenges,
+      earnedBadges,
+      xp: nextXp,
+      level: nextLevel,
       streak: profile.streak + 1
     });
 
@@ -357,16 +358,16 @@ export function MindBloomProvider({ children }: { children: React.ReactNode }) {
       return updated;
     });
 
-    const chatChallenge = challenges.find(c => c.id === 'c3');
-    if (chatChallenge && !chatChallenge.completed) {
-      setChallenges(prevC => {
-        const updatedC = prevC.map(c => c.id === 'c3' ? { ...c, completed: true } : c);
-        localStorage.setItem('mb_challenges', JSON.stringify(updatedC));
-        return updatedC;
-      });
+    const chatChallenge = initialChallenges.find(c => c.id === 'c3');
+    const completedChallenges = [...(profile.completedChallenges || [])];
+    if (chatChallenge && !completedChallenges.includes('c3')) {
+      completedChallenges.push('c3');
+      const nextXp = profile.xp + chatChallenge.xpReward;
+      const nextLevel = Math.floor(nextXp / 200) + 1;
       updateProfile({
-        xp: profile.xp + chatChallenge.xpReward,
-        level: Math.floor((profile.xp + chatChallenge.xpReward) / 200) + 1
+        completedChallenges,
+        xp: nextXp,
+        level: nextLevel
       });
     }
 
@@ -442,41 +443,38 @@ export function MindBloomProvider({ children }: { children: React.ReactNode }) {
 
   // Toggle/Complete generic challenge
   const toggleChallenge = (id: string) => {
-    setChallenges(prev => {
-      const updated = prev.map(c => {
-        if (c.id === id) {
-          const nextCompleted = !c.completed;
-          if (nextCompleted) {
-            updateProfile({
-              xp: profile.xp + c.xpReward,
-              level: Math.floor((profile.xp + c.xpReward) / 200) + 1
-            });
-          } else {
-            updateProfile({
-              xp: Math.max(0, profile.xp - c.xpReward),
-              level: Math.floor(Math.max(0, profile.xp - c.xpReward) / 200) + 1
-            });
-          }
-          return { ...c, completed: nextCompleted };
-        }
-        return c;
-      });
-      localStorage.setItem('mb_challenges', JSON.stringify(updated));
-      return updated;
+    const currentCompleted = profile.completedChallenges || [];
+    const isCompleted = currentCompleted.includes(id);
+    let nextCompleted: string[];
+    let xpDiff = 0;
+    const challenge = initialChallenges.find(c => c.id === id);
+    const xpReward = challenge ? challenge.xpReward : 0;
+
+    if (isCompleted) {
+      nextCompleted = currentCompleted.filter(cid => cid !== id);
+      xpDiff = -xpReward;
+    } else {
+      nextCompleted = [...currentCompleted, id];
+      xpDiff = xpReward;
+    }
+
+    const nextXp = Math.max(0, profile.xp + xpDiff);
+    const nextLevel = Math.floor(nextXp / 200) + 1;
+
+    updateProfile({
+      completedChallenges: nextCompleted,
+      xp: nextXp,
+      level: nextLevel
     });
   };
 
   // Badge earner
   const earnBadge = (id: string) => {
-    setBadges(prev => {
-      const updated = prev.map(b => {
-        if (b.id === id && !b.earned) {
-          return { ...b, earned: true, earnedDate: new Date().toISOString().split('T')[0] };
-        }
-        return b;
-      });
-      localStorage.setItem('mb_badges', JSON.stringify(updated));
-      return updated;
+    const currentBadges = profile.earnedBadges || [];
+    if (currentBadges.includes(id)) return;
+    const nextBadges = [...currentBadges, id];
+    updateProfile({
+      earnedBadges: nextBadges
     });
   };
 
@@ -500,14 +498,12 @@ export function MindBloomProvider({ children }: { children: React.ReactNode }) {
 
     const commChallenge = challenges.find(c => c.id === 'c4');
     if (commChallenge && !commChallenge.completed) {
-      setChallenges(prevC => {
-        const updatedC = prevC.map(c => c.id === 'c4' ? { ...c, completed: true } : c);
-        localStorage.setItem('mb_challenges', JSON.stringify(updatedC));
-        return updatedC;
-      });
+      const nextCompleted = [...(profile.completedChallenges || []), 'c4'];
+      const nextXp = profile.xp + commChallenge.xpReward;
       updateProfile({
-        xp: profile.xp + commChallenge.xpReward,
-        level: Math.floor((profile.xp + commChallenge.xpReward) / 200) + 1
+        completedChallenges: nextCompleted,
+        xp: nextXp,
+        level: Math.floor(nextXp / 200) + 1
       });
     }
 
@@ -612,7 +608,9 @@ export function MindBloomProvider({ children }: { children: React.ReactNode }) {
         earnBadge,
         posts,
         addPost,
-        reactToPost
+        reactToPost,
+        user,
+        isLoading
       }}
     >
       {children}

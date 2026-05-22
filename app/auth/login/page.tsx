@@ -68,10 +68,12 @@ export default function LoginPage() {
             alcohol: profileData.alcohol || '',
             intentions: profileData.intentions || [],
             challenges: profileData.challenges || [],
-            xp: profileData.xp || 120,
+            xp: profileData.xp || 0,
             level: profileData.level || 1,
-            streak: profileData.streak || 3,
-            notificationsEnabled: profileData.notifications_enabled ?? true
+            streak: profileData.streak || 0,
+            notificationsEnabled: profileData.notifications_enabled ?? true,
+            earnedBadges: profileData.earned_badges || [],
+            completedChallenges: profileData.completed_challenges || []
           });
 
           if (profileData.role && profileData.role !== 'none') {
@@ -99,7 +101,7 @@ export default function LoginPage() {
         <Link href="/">Mindbloom</Link>
       </div>
 
-      <div className="w-full max-w-[420px] glass-card p-8 rounded-lg shadow-xl">
+      <div className="w-full max-w-[420px] glass-card p-8 rounded-[4px] shadow-xl">
         <div className="text-center mb-8">
           <h1 className="font-display text-2xl font-bold text-foreground">Welcome Back</h1>
           <p className="font-sans text-sm text-on-surface-variant mt-2">
@@ -108,7 +110,7 @@ export default function LoginPage() {
         </div>
 
         {error && (
-          <div className="p-3 bg-error-container text-on-error-container text-xs rounded-lg mb-6 border border-error/25 font-sans">
+          <div className="p-3 bg-error-container text-on-error-container text-xs rounded-[4px] mb-6 border border-error/25 font-sans">
             {error}
           </div>
         )}
@@ -123,7 +125,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="alex@example.com"
-              className="w-full px-4 py-3 bg-surface-container-low text-foreground border border-outline-variant rounded-lg font-sans text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+              className="w-full px-4 py-3 bg-surface-container-low text-foreground border border-outline-variant rounded-[4px] font-sans text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
             />
           </div>
 
@@ -141,14 +143,14 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-4 py-3 bg-surface-container-low text-foreground border border-outline-variant rounded-lg font-sans text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+              className="w-full px-4 py-3 bg-surface-container-low text-foreground border border-outline-variant rounded-[4px] font-sans text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full pill-button-primary py-3.5 mt-2 rounded-lg font-sans text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            className="w-full pill-button-primary py-3.5 mt-2 rounded-[4px] font-sans text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
             {loading ? (
               <span className="w-5 h-5 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></span>
@@ -193,7 +195,7 @@ export default function LoginPage() {
                 }
               }
             }}
-            className="flex-1 py-3 px-4 bg-surface-container border border-outline-variant hover:bg-surface-container-high/60 text-foreground text-xs font-semibold rounded-lg flex items-center justify-center gap-2 cursor-pointer transition-all"
+            className="flex-1 py-3 px-4 bg-surface-container border border-outline-variant hover:bg-surface-container-high/60 text-foreground text-xs font-semibold rounded-[4px] flex items-center justify-center gap-2 cursor-pointer transition-all"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path

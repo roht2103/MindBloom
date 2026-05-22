@@ -1,24 +1,33 @@
 import os
 import jwt
+from jwt import PyJWKClient
 from functools import wraps
 from flask import Flask, request, jsonify, g
 from flask_cors import CORS
 from supabase import create_client, Client
 from dotenv import load_dotenv
+from datetime import datetime, date
 
 load_dotenv()
 
 app = Flask(__name__)
-# Enable CORS for Next.js frontend running on port 3000
-CORS(app, resources={r"/api/*": {"origins": ["http://localhost:3000"]}})
+# Enable CORS for Next.js frontend running on port 3000 (localhost and 127.0.0.1)
+CORS(app, resources={r"/api/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000"]}})
 
 # Initialize Supabase
 supabase_url = os.environ.get("SUPABASE_URL", "https://mock-project.supabase.co")
 supabase_key = os.environ.get("SUPABASE_SERVICE_KEY") or os.environ.get("SUPABASE_ANON_KEY", "mock-anon")
+supabase_anon_key = os.environ.get("SUPABASE_ANON_KEY", "mock-anon")
 supabase_jwt_secret = os.environ.get("SUPABASE_JWT_SECRET", "mock-secret")
 
 # Check if we are running in Mock mode
 is_mock_mode = "mock-project" in supabase_url or supabase_key == "mock-anon"
+
+# Initialize JWK client for ES256 token verification
+jwk_client = None
+if not is_mock_mode:
+    jwks_url = f"{supabase_url}/auth/v1/.well-known/jwks.json"
+    jwk_client = PyJWKClient(jwks_url, headers={"apiKey": supabase_anon_key})
 
 supabase_client: Client = None
 if not is_mock_mode:
@@ -45,23 +54,47 @@ def require_auth(f):
             return f(*args, **kwargs)
             
         try:
-            # Decode and verify JWT using Supabase HS256 key secret
-            decoded = jwt.decode(
-                token, 
-                supabase_jwt_secret, 
-                algorithms=["HS256"], 
-                audience="authenticated"
-            )
+            # First, check the header to see what algorithm is used
+            hdr = jwt.get_unverified_header(token)
+            alg = hdr.get("alg")
+            
+            if alg == "ES256" and jwk_client:
+                # Retrieve public key from JWKS endpoint
+                signing_key = jwk_client.get_signing_key_from_jwt(token)
+                decoded = jwt.decode(
+                    token,
+                    signing_key.key,
+                    algorithms=["ES256"],
+                    audience="authenticated"
+                )
+            else:
+                # Default to HS256 using Supabase JWT secret
+                decoded = jwt.decode(
+                    token, 
+                    supabase_jwt_secret, 
+                    algorithms=["HS256"], 
+                    audience="authenticated"
+                )
             g.user_id = decoded["sub"]
             g.email = decoded.get("email")
         except jwt.ExpiredSignatureError as e:
             print(f"Auth Error (Expired): {e}")
             return jsonify({"error": "Session token has expired"}), 401
         except jwt.InvalidTokenError as e:
+            try:
+                hdr = jwt.get_unverified_header(token)
+                print(f"Auth Error (InvalidToken) - Token Header: {hdr}")
+            except Exception as ex:
+                print(f"Failed to parse token header: {ex}")
             print(f"Auth Error (InvalidToken): {e}")
             import traceback
             traceback.print_exc()
             return jsonify({"error": f"Invalid session token: {str(e)}"}), 401
+        except Exception as e:
+            print(f"Auth Error (General): {e}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({"error": f"Authentication failed: {str(e)}"}), 401
             
         return f(*args, **kwargs)
     return decorated
@@ -72,16 +105,18 @@ mock_profile = {
     "email": "alex@mindbloom.ai",
     "role": "none",
     "gender": "",
-    "smoking": "no",
-    "alcohol": "never",
+    "smoking": "No",
+    "alcohol": "Never",
     "age": 24,
-    "maritalStatus": "single",
+    "maritalStatus": "Single",
     "intentions": [],
     "challenges": [],
-    "xp": 120,
+    "xp": 0,
     "level": 1,
-    "streak": 3,
-    "notificationsEnabled": True
+    "streak": 0,
+    "notificationsEnabled": True,
+    "earnedBadges": [],
+    "completedChallenges": []
 }
 mock_checkins = []
 mock_chat_messages = [
@@ -109,6 +144,120 @@ def calculate_stress(value, sleep_hours, focus_score):
     focus_factor = 10 - focus_score
     raw = (mood_factor * 0.4) + (sleep_factor * 0.35) + (focus_factor * 0.25)
     return max(1, min(10, round(raw)))
+
+# --- Helper logic to update profile streak, level, and quests on check-in ---
+def update_gamification_on_mood_checkin(user_id, value, stress_level, date_val, is_mock=False):
+    global mock_profile, mock_checkins
+    
+    # 1. Fetch current profile data and recent check-ins
+    if is_mock:
+        prof = mock_profile
+        last_logs = mock_checkins
+    else:
+        # Fetch from Supabase
+        res = supabase_client.table("profiles").select("*").eq("id", user_id).execute()
+        if not res.data:
+            # Create default profile first
+            default_prof = {
+                "id": user_id,
+                "name": g.email.split("@")[0] if getattr(g, "email", None) else "New User",
+                "email": getattr(g, "email", "") or "",
+                "role": "none",
+                "xp": 0,
+                "level": 1,
+                "streak": 0,
+                "earned_badges": [],
+                "completed_challenges": []
+            }
+            supabase_client.table("profiles").insert(default_prof).execute()
+            prof_data = default_prof
+        else:
+            prof_data = res.data[0]
+            
+        prof = {
+            "xp": prof_data.get("xp", 0),
+            "level": prof_data.get("level", 1),
+            "streak": prof_data.get("streak", 0),
+            "completedChallenges": prof_data.get("completed_challenges") or [],
+            "earnedBadges": prof_data.get("earned_badges") or []
+        }
+        
+        # Fetch last log before this date
+        log_res = supabase_client.table("mood_checkins")\
+            .select("date")\
+            .eq("user_id", user_id)\
+            .order("date", desc=True)\
+            .limit(1)\
+            .execute()
+        last_logs = log_res.data or []
+
+    # 2. Determine new streak
+    current_streak = prof.get("streak", 0)
+    new_streak = current_streak
+    
+    last_date_str = None
+    if is_mock:
+        if last_logs:
+            last_date_str = last_logs[0].get("date")
+    else:
+        if last_logs:
+            last_date_str = last_logs[0].get("date")
+            
+    if last_date_str:
+        try:
+            last_dt = datetime.strptime(last_date_str, "%Y-%m-%d").date()
+            curr_dt = datetime.strptime(date_val, "%Y-%m-%d").date()
+            diff = (curr_dt - last_dt).days
+            
+            if diff == 0:
+                new_streak = current_streak if current_streak > 0 else 1
+            elif diff == 1:
+                new_streak = current_streak + 1
+            else:
+                new_streak = 1
+        except Exception as e:
+            print(f"Error parsing dates: {e}")
+            new_streak = 1
+    else:
+        # First check-in ever
+        new_streak = 1
+
+    # 3. Determine XP gains and badge completions
+    xp_gain = 20 # Standard log mood XP
+    
+    completed_challenges = list(prof.get("completedChallenges") or [])
+    if "c1" not in completed_challenges:
+        completed_challenges.append("c1")
+        xp_gain += 20 # Daily Mood Log quest reward
+
+    earned_badges = list(prof.get("earnedBadges") or [])
+    if "b1" not in earned_badges:
+        earned_badges.append("b1") # First check-in badge
+
+    if stress_level <= 2 and "b3" not in earned_badges:
+        earned_badges.append("b3") # Stress warrior badge
+
+    if new_streak >= 7 and "b5" not in earned_badges:
+        earned_badges.append("b5") # 7-day streak badge
+
+    new_xp = prof.get("xp", 0) + xp_gain
+    new_level = (new_xp // 200) + 1
+
+    # 4. Save profile changes
+    if is_mock:
+        mock_profile["streak"] = new_streak
+        mock_profile["xp"] = new_xp
+        mock_profile["level"] = new_level
+        mock_profile["completedChallenges"] = completed_challenges
+        mock_profile["earnedBadges"] = earned_badges
+    else:
+        supabase_client.table("profiles").update({
+            "streak": new_streak,
+            "xp": new_xp,
+            "level": new_level,
+            "completed_challenges": completed_challenges,
+            "earned_badges": earned_badges
+        }).eq("id", user_id).execute()
 
 # --- Helper logic for AI classifier ---
 def classify_sentiment(text):
@@ -148,7 +297,7 @@ def health_check():
 @require_auth
 def profile_route():
     global mock_profile
-    if is_mock_mode:
+    if is_mock_mode or g.user_id == "mock-user-uuid":
         if request.method in ["POST", "PUT"]:
             data = request.json or {}
             for key, val in data.items():
@@ -167,7 +316,7 @@ def profile_route():
         if "gender" in data: db_fields["gender"] = data["gender"]
         if "smoking" in data: db_fields["smoking"] = data["smoking"]
         if "alcohol" in data: db_fields["alcohol"] = data["alcohol"]
-        if "age" in data: db_fields["age"] = int(data["age"])
+        if "age" in data: db_fields["age"] = int(data["age"]) if data["age"] is not None else None
         if "maritalStatus" in data: db_fields["marital_status"] = data["maritalStatus"]
         if "intentions" in data: db_fields["intentions"] = data["intentions"]
         if "challenges" in data: db_fields["challenges"] = data["challenges"]
@@ -175,10 +324,42 @@ def profile_route():
         if "level" in data: db_fields["level"] = int(data["level"])
         if "streak" in data: db_fields["streak"] = int(data["streak"])
         if "notificationsEnabled" in data: db_fields["notifications_enabled"] = data["notificationsEnabled"]
+        if "earnedBadges" in data: db_fields["earned_badges"] = data["earnedBadges"]
+        if "completedChallenges" in data: db_fields["completed_challenges"] = data["completedChallenges"]
 
-        # Insert or update
-        res = supabase_client.table("profiles").upsert({"id": g.user_id, **db_fields}).execute()
-        return jsonify(res.data[0] if res.data else {})
+        # Check if profile exists
+        existing = supabase_client.table("profiles").select("id").eq("id", g.user_id).execute()
+        if existing.data:
+            res = supabase_client.table("profiles").update(db_fields).eq("id", g.user_id).execute()
+        else:
+            insert_fields = {
+                "id": g.user_id,
+                "name": db_fields.get("name") or (g.email.split("@")[0] if g.email else "New User"),
+                "email": db_fields.get("email") or (g.email or ""),
+                **db_fields
+            }
+            res = supabase_client.table("profiles").insert(insert_fields).execute()
+        if res.data:
+            db_prof = res.data[0]
+            return jsonify({
+                "name": db_prof.get("name"),
+                "email": db_prof.get("email"),
+                "role": db_prof.get("role"),
+                "gender": db_prof.get("gender"),
+                "smoking": db_prof.get("smoking"),
+                "alcohol": db_prof.get("alcohol"),
+                "age": db_prof.get("age"),
+                "maritalStatus": db_prof.get("marital_status"),
+                "intentions": db_prof.get("intentions") or [],
+                "challenges": db_prof.get("challenges") or [],
+                "xp": db_prof.get("xp", 0),
+                "level": db_prof.get("level", 1),
+                "streak": db_prof.get("streak", 0),
+                "notificationsEnabled": db_prof.get("notifications_enabled", True),
+                "earnedBadges": db_prof.get("earned_badges") or [],
+                "completedChallenges": db_prof.get("completed_challenges") or []
+            })
+        return jsonify({})
     else:
         res = supabase_client.table("profiles").select("*").eq("id", g.user_id).execute()
         if res.data:
@@ -195,29 +376,75 @@ def profile_route():
                 "maritalStatus": db_prof.get("marital_status"),
                 "intentions": db_prof.get("intentions") or [],
                 "challenges": db_prof.get("challenges") or [],
-                "xp": db_prof.get("xp", 120),
+                "xp": db_prof.get("xp", 0),
                 "level": db_prof.get("level", 1),
-                "streak": db_prof.get("streak", 3),
-                "notificationsEnabled": db_prof.get("notifications_enabled", True)
+                "streak": db_prof.get("streak", 0),
+                "notificationsEnabled": db_prof.get("notifications_enabled", True),
+                "earnedBadges": db_prof.get("earned_badges") or [],
+                "completedChallenges": db_prof.get("completed_challenges") or []
             }
             return jsonify(fe_prof)
-        return jsonify({"error": "Profile not found"}), 404
+        else:
+            # Create a default profile if not found
+            default_db_prof = {
+                "id": g.user_id,
+                "name": g.email.split("@")[0] if g.email else "New User",
+                "email": g.email or "",
+                "role": "none",
+                "xp": 0,
+                "level": 1,
+                "streak": 0,
+                "earned_badges": [],
+                "completed_challenges": []
+            }
+            res_insert = supabase_client.table("profiles").insert(default_db_prof).execute()
+            if res_insert.data:
+                db_prof = res_insert.data[0]
+                return jsonify({
+                    "name": db_prof.get("name"),
+                    "email": db_prof.get("email"),
+                    "role": db_prof.get("role"),
+                    "gender": db_prof.get("gender"),
+                    "smoking": db_prof.get("smoking"),
+                    "alcohol": db_prof.get("alcohol"),
+                    "age": db_prof.get("age"),
+                    "maritalStatus": db_prof.get("marital_status"),
+                    "intentions": db_prof.get("intentions") or [],
+                    "challenges": db_prof.get("challenges") or [],
+                    "xp": db_prof.get("xp", 0),
+                    "level": db_prof.get("level", 1),
+                    "streak": db_prof.get("streak", 0),
+                    "notificationsEnabled": db_prof.get("notifications_enabled", True),
+                    "earnedBadges": db_prof.get("earned_badges") or [],
+                    "completedChallenges": db_prof.get("completed_challenges") or []
+                })
+            return jsonify({"error": "Profile not found"}), 404
 
 # Mood Check-in Endpoints
 @app.route("/api/mood", methods=["GET", "POST"])
 @require_auth
 def mood_route():
     global mock_checkins
-    if is_mock_mode:
+    if is_mock_mode or g.user_id == "mock-user-uuid":
         if request.method == "POST":
             data = request.json or {}
             stress = calculate_stress(data.get("value", 7), data.get("sleepHours", 7.5), data.get("focusScore", 7))
+            date_val = data.get("date") or datetime.now().strftime("%Y-%m-%d")
+            
+            update_gamification_on_mood_checkin(
+                user_id="mock-user-uuid",
+                value=data.get("value", 7),
+                stress_level=stress,
+                date_val=date_val,
+                is_mock=True
+            )
+            
             new_log = {
                 "id": str(len(mock_checkins) + 1),
                 "value": data.get("value", 7),
                 "note": data.get("note", ""),
-                "date": data.get("date", "2026-05-22"),
-                "timestamp": "2026-05-22T14:50:00Z",
+                "date": date_val,
+                "timestamp": datetime.now().isoformat() + "Z",
                 "tags": data.get("tags", []),
                 "sleepHours": data.get("sleepHours", 7.5),
                 "focusScore": data.get("focusScore", 7),
@@ -230,18 +457,39 @@ def mood_route():
     if request.method == "POST":
         data = request.json or {}
         stress = calculate_stress(data.get("value", 7), data.get("sleepHours", 7.5), data.get("focusScore", 7))
+        date_val = data.get("date") or datetime.now().strftime("%Y-%m-%d")
+        
+        update_gamification_on_mood_checkin(
+            user_id=g.user_id,
+            value=data.get("value", 7),
+            stress_level=stress,
+            date_val=date_val,
+            is_mock=False
+        )
+        
         db_log = {
             "user_id": g.user_id,
             "value": int(data.get("value", 7)),
             "note": data.get("note", ""),
-            "date": data.get("date"),
+            "date": date_val,
             "tags": data.get("tags", []),
             "sleep_hours": float(data.get("sleepHours", 7.5)),
             "focus_score": int(data.get("focusScore", 7)),
             "stress_level": stress
         }
         res = supabase_client.table("mood_checkins").insert(db_log).execute()
-        return jsonify(res.data[0] if res.data else {})
+        saved_log = res.data[0] if res.data else {}
+        return jsonify({
+            "id": saved_log.get("id"),
+            "value": saved_log.get("value"),
+            "note": saved_log.get("note"),
+            "date": saved_log.get("date"),
+            "timestamp": saved_log.get("timestamp"),
+            "tags": saved_log.get("tags") or [],
+            "sleepHours": float(saved_log.get("sleep_hours", 7.5)),
+            "focusScore": saved_log.get("focus_score"),
+            "stressLevel": saved_log.get("stress_level")
+        })
     else:
         res = supabase_client.table("mood_checkins").select("*").eq("user_id", g.user_id).order("timestamp", desc=True).execute()
         fe_logs = []
@@ -264,7 +512,7 @@ def mood_route():
 @require_auth
 def chat_route():
     global mock_chat_messages
-    if is_mock_mode:
+    if is_mock_mode or g.user_id == "mock-user-uuid":
         if request.method == "POST":
             data = request.json or {}
             content = data.get("content", "")
@@ -338,7 +586,7 @@ def chat_route():
 @require_auth
 def chat_clear_route():
     global mock_chat_messages
-    if is_mock_mode:
+    if is_mock_mode or g.user_id == "mock-user-uuid":
         mock_chat_messages = [
             { "id": "m_init", "role": "assistant", "content": "Hello! I'm your MindBloom wellness companion. How has your day been?", "timestamp": "2026-05-22T09:00:00Z" }
         ]
@@ -352,7 +600,7 @@ def chat_clear_route():
 @require_auth
 def community_route():
     global mock_posts
-    if is_mock_mode:
+    if is_mock_mode or g.user_id == "mock-user-uuid":
         if request.method == "POST":
             data = request.json or {}
             content = data.get("content", "")
@@ -439,8 +687,7 @@ def community_react_route():
     data = request.json or {}
     post_id = data.get("postId")
     reaction_type = data.get("reactionType") # 'hugs' | 'support' | 'calm'
-    
-    if is_mock_mode:
+    if is_mock_mode or g.user_id == "mock-user-uuid":
         global mock_posts
         for post in mock_posts:
             if post["id"] == post_id:

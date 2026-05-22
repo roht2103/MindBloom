@@ -71,7 +71,7 @@ export default function SettingsPage() {
         <section className="lg:col-span-7 space-y-6">
           
           {/* General customization card */}
-          <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-5 shadow-sm space-y-5">
+          <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-5 shadow-sm space-y-5">
             <h3 className="text-sm font-display font-bold text-on-surface">Preferences</h3>
             
             {/* Dark mode toggle control */}
@@ -83,7 +83,7 @@ export default function SettingsPage() {
               
               <button
                 onClick={toggleTheme}
-                className="bg-primary text-on-primary hover:bg-primary/95 text-xs font-bold px-4 py-2 rounded-lg transition-all cursor-pointer shadow-sm select-none"
+                className="bg-primary text-on-primary hover:bg-primary/95 text-xs font-bold px-4 py-2 rounded-[4px] transition-all cursor-pointer shadow-sm select-none"
               >
                 {theme === 'light' ? 'Enable Dark Mode' : 'Enable Light Mode'}
               </button>
@@ -99,7 +99,7 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={handleNotificationToggle}
-                className={`text-xs font-bold px-4 py-2 rounded-lg transition-all cursor-pointer border select-none ${
+                className={`text-xs font-bold px-4 py-2 rounded-[4px] transition-all cursor-pointer border select-none ${
                   profile.notificationsEnabled
                     ? 'bg-secondary/10 border-secondary text-secondary hover:bg-secondary/15'
                     : 'bg-surface border-outline-variant/30 text-on-surface-variant hover:border-outline'
@@ -112,7 +112,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Privacy Slider Card */}
-          <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-5 shadow-sm space-y-4">
+          <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-5 shadow-sm space-y-4">
             <h3 className="text-sm font-display font-bold text-on-surface">Data Privacy Controls</h3>
             
             <div className="space-y-3">
@@ -128,7 +128,7 @@ export default function SettingsPage() {
                 step="1"
                 value={privacyLevel}
                 onChange={(e) => setPrivacyLevel(parseInt(e.target.value))}
-                className="w-full h-2 bg-surface-container-high rounded-lg appearance-none cursor-pointer accent-primary"
+                className="w-full h-2 bg-surface-container-high rounded-[4px] appearance-none cursor-pointer accent-primary"
               />
               
               <div className="flex justify-between text-[9px] text-on-surface-variant font-bold px-1 select-none">
@@ -137,7 +137,7 @@ export default function SettingsPage() {
                 <span>Clinician (3)</span>
               </div>
 
-              <div className="bg-surface border border-outline-variant/15 p-3 rounded-lg mt-3">
+              <div className="bg-surface border border-outline-variant/15 p-3 rounded-[4px] mt-3">
                 <p className="text-[10px] leading-relaxed text-on-surface-variant font-semibold">
                   {currentPrivacy.desc}
                 </p>
@@ -151,21 +151,21 @@ export default function SettingsPage() {
         <div className="lg:col-span-5 space-y-6">
           
           {/* Data Portability Card */}
-          <section className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-5 shadow-sm space-y-4">
+          <section className="bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-5 shadow-sm space-y-4">
             <h3 className="text-sm font-display font-bold text-on-surface">Data Portability</h3>
             <p className="text-xs text-on-surface-variant leading-relaxed font-medium">
               We respect your right to hold and move your personal history. You can request a copy of all log records in JSON format.
             </p>
 
             {showExportAlert && (
-              <div className="p-3 bg-secondary/15 border border-secondary/20 text-secondary text-[11px] font-bold rounded-lg text-center animate-pulse">
+              <div className="p-3 bg-secondary/15 border border-secondary/20 text-secondary text-[11px] font-bold rounded-[4px] text-center animate-pulse">
                 ✓ Check-in data compiled. Downloading file.
               </div>
             )}
 
             <button
               onClick={handleExportData}
-              className="w-full inline-flex items-center justify-center bg-primary text-on-primary hover:bg-primary/95 py-2.5 rounded-lg text-xs font-bold transition-all shadow-md shadow-primary/10 cursor-pointer"
+              className="w-full inline-flex items-center justify-center bg-primary text-on-primary hover:bg-primary/95 py-2.5 rounded-[4px] text-xs font-bold transition-all shadow-md shadow-primary/10 cursor-pointer"
             >
               <span className="material-symbols-outlined text-[18px] mr-2">download</span>
               Export Wellness History
@@ -173,7 +173,7 @@ export default function SettingsPage() {
           </section>
 
           {/* Reset Application Card */}
-          <section className="bg-red-500/5 border border-red-500/20 rounded-lg p-5 space-y-3">
+          <section className="bg-red-500/5 border border-red-500/20 rounded-[4px] p-5 space-y-3">
             <div className="flex items-center gap-2 text-red-500">
               <span className="material-symbols-outlined text-[20px]">delete_forever</span>
               <h3 className="text-xs font-display font-bold">Danger Zone</h3>
@@ -183,7 +183,7 @@ export default function SettingsPage() {
             </p>
             <button
               onClick={handleResetData}
-              className="w-full bg-red-500 text-on-primary hover:bg-red-600 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-sm"
+              className="w-full bg-red-500 text-on-primary hover:bg-red-600 py-2.5 rounded-[4px] text-xs font-bold transition-all cursor-pointer shadow-sm"
             >
               Erase Platform Data
             </button>

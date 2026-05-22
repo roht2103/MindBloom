@@ -86,10 +86,10 @@ export default function LandingPage() {
 
           {/* Hero Illustration */}
           <div className="mt-16 relative w-full max-w-5xl mx-auto h-[320px] md:h-[500px] flex justify-center items-center">
-            <div className="absolute inset-0 bg-primary/5 rounded-xl blur-3xl scale-75"></div>
+            <div className="absolute inset-0 bg-primary/5 rounded-[4px] blur-3xl scale-75"></div>
             <img
               alt="Minimalist Mindful Illustration"
-              className="relative z-10 w-full h-full object-contain rounded-xl floating-anim select-none"
+              className="relative z-10 w-full h-full object-contain rounded-[4px] floating-anim select-none"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC55uIBcvmsy2gPdycauPbYaV051V33q5wiLW01II0HwGDOBwpb5vLCmmoZQM9GItEaQcNMeBWea9BbFhGyoe5Y2qRyFyie8dALAhbkR6_LUGhb_8IA-RyqwGo6SwLgj2PLk8q2m3VQfRH9RkWFgxHS52h6fN9YqHFvTJBWZ-GlaISP5UpSZVQVl8iC8p1_xLlBZD-UTe9ojTXTkhAzsxJSijG5h6jr16hTm0q-Lz7F_B6F_b4GqAz1Moylg2GHNEZP6zj-qmhYw"
             />
           </div>
@@ -114,8 +114,8 @@ export default function LandingPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Card 1: AI Chat Support */}
-            <div className="glass-card p-8 rounded-lg flex flex-col gap-6 group hover:-translate-y-1 transition-all duration-300">
-              <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+            <div className="glass-card p-8 rounded-[4px] flex flex-col gap-6 group hover:-translate-y-1 transition-all duration-300">
+              <div className="w-14 h-14 rounded-[4px] bg-primary/10 flex items-center justify-center text-primary">
                 <span className="material-symbols-outlined text-[32px] select-none">
                   chat_bubble
                 </span>
@@ -136,8 +136,8 @@ export default function LandingPage() {
             </div>
 
             {/* Card 2: Mood Tracking */}
-            <div className="glass-card p-8 rounded-lg flex flex-col gap-6 group hover:-translate-y-1 transition-all duration-300">
-              <div className="w-14 h-14 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+            <div className="glass-card p-8 rounded-[4px] flex flex-col gap-6 group hover:-translate-y-1 transition-all duration-300">
+              <div className="w-14 h-14 rounded-[4px] bg-secondary/10 flex items-center justify-center text-secondary">
                 <span className="material-symbols-outlined text-[32px] select-none">
                   spa
                 </span>
@@ -158,8 +158,8 @@ export default function LandingPage() {
             </div>
 
             {/* Card 3: Relief Tools Library */}
-            <div className="glass-card p-8 rounded-lg flex flex-col gap-6 group hover:-translate-y-1 transition-all duration-300">
-              <div className="w-14 h-14 rounded-lg bg-tertiary/10 flex items-center justify-center text-tertiary">
+            <div className="glass-card p-8 rounded-[4px] flex flex-col gap-6 group hover:-translate-y-1 transition-all duration-300">
+              <div className="w-14 h-14 rounded-[4px] bg-tertiary/10 flex items-center justify-center text-tertiary">
                 <span className="material-symbols-outlined text-[32px] select-none">
                   extension
                 </span>
@@ -183,7 +183,7 @@ export default function LandingPage() {
 
         {/* Dynamic Content Area / Testimonial */}
         <section className="px-6 md:px-12 max-w-7xl mx-auto mb-16">
-          <div className="glass-card rounded-xl overflow-hidden flex flex-col md:flex-row items-stretch min-h-[480px]">
+          <div className="glass-card rounded-[4px] overflow-hidden flex flex-col md:flex-row items-stretch min-h-[480px]">
             <div className="flex-1 p-8 md:p-16 flex flex-col justify-center">
               <span className="font-sans text-xs font-semibold text-primary mb-4 uppercase tracking-widest">
                 Breathing Room
@@ -195,7 +195,7 @@ export default function LandingPage() {
                 Our platform is built on clinically-validated techniques wrapped in a beautiful, non-intimidating experience. No clutter, no noise, just you and your peace of mind.
               </p>
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg overflow-hidden bg-surface-container">
+                <div className="w-12 h-12 rounded-[4px] overflow-hidden bg-surface-container">
                   <img
                     alt="User avatar"
                     className="w-full h-full object-cover"

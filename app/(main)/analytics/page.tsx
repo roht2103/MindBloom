@@ -5,7 +5,7 @@ import { useMindBloom } from '@/components/ui/mindbloom-provider';
 import { AnomalyDetectionService } from '@/services/anomaly-detection';
 
 export default function AnalyticsPage() {
-  const { checkins } = useMindBloom();
+  const { checkins, profile, badges } = useMindBloom();
 
   // 1. Calculate Average Statistics
   const totalEntries = checkins.length;
@@ -26,11 +26,15 @@ export default function AnalyticsPage() {
     ? (recentEntries.reduce((sum, item) => sum + item.focusScore, 0) / recentEntries.length).toFixed(1)
     : '—';
 
+  // Gamification calculations
+  const currentLevelXp = profile.xp % 200;
+  const progressPercent = Math.min(100, Math.floor((currentLevelXp / 200) * 100));
+
   // 2. Generate SVG coordinates for Stress Trend Graph (Last 6 entries)
   const renderTrendGraph = () => {
     if (checkins.length < 2) {
       return (
-        <div className="h-48 flex items-center justify-center border border-dashed border-outline-variant/30 rounded-lg text-xs text-on-surface-variant font-medium">
+        <div className="h-48 flex items-center justify-center border border-dashed border-outline-variant/30 rounded-[4px] text-xs text-on-surface-variant font-medium">
           Not enough mood logs to display trend lines. Log at least 2 entries.
         </div>
       );
@@ -171,7 +175,7 @@ export default function AnalyticsPage() {
       {/* Stats Counter Row */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Mood Avg card */}
-        <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-5 shadow-sm">
+        <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-5 shadow-sm">
           <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block">Average Mood</span>
           <div className="flex items-baseline gap-1 mt-2">
             <span className="text-3xl font-display font-extrabold text-primary">{avgMood}</span>
@@ -181,7 +185,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Sleep Avg card */}
-        <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-5 shadow-sm">
+        <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-5 shadow-sm">
           <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block">Average Sleep</span>
           <div className="flex items-baseline gap-1 mt-2">
             <span className="text-3xl font-display font-extrabold text-secondary">{avgSleep}</span>
@@ -191,7 +195,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Stress score avg card */}
-        <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-5 shadow-sm">
+        <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-5 shadow-sm">
           <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block">Average Stress</span>
           <div className="flex items-baseline gap-1 mt-2">
             <span className="text-3xl font-display font-extrabold text-tertiary">{avgStress}</span>
@@ -201,7 +205,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Focus avg card */}
-        <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-5 shadow-sm">
+        <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-5 shadow-sm">
           <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block">Average Focus</span>
           <div className="flex items-baseline gap-1 mt-2">
             <span className="text-3xl font-display font-extrabold text-primary">{avgFocus}</span>
@@ -211,11 +215,11 @@ export default function AnalyticsPage() {
         </div>
       </section>
 
-      {/* Chart Section */}
+      {/* Chart & Gamification Section */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Trend Graph */}
-        <section className="lg:col-span-8 bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-6 shadow-sm flex flex-col justify-between">
+        <section className="lg:col-span-8 bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-6 shadow-sm flex flex-col justify-between">
           <div>
             <h3 className="text-sm font-display font-bold text-on-surface">Stress Rating Trend</h3>
             <p className="text-xs text-on-surface-variant mt-0.5 font-medium">Visual log representation of stress indices</p>
@@ -225,46 +229,88 @@ export default function AnalyticsPage() {
           </div>
         </section>
 
-        {/* AI Recommendations summary */}
-        <section className="lg:col-span-4 bg-surface-container border border-outline-variant/20 rounded-lg p-6 shadow-sm flex flex-col justify-between relative overflow-hidden group">
-          <div className="relative z-10 space-y-4">
-            <div className="inline-flex items-center gap-1.5 bg-primary/10 text-primary px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">
-              <span className="material-symbols-outlined text-[14px]">auto_awesome</span>
-              <span>AI Clinical Summary</span>
+        {/* Side Panel: Gamification + AI Recommendations */}
+        <div className="lg:col-span-4 space-y-6 flex flex-col">
+          {/* Gamification Analytics Card */}
+          <section className="bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-5 shadow-sm space-y-4">
+            <div className="inline-flex items-center gap-1.5 bg-secondary/10 text-secondary px-2.5 py-1 rounded-[4px] text-[10px] font-bold uppercase tracking-wider">
+              <span className="material-symbols-outlined text-[14px]">military_tech</span>
+              <span>Gamification Stats</span>
             </div>
             
-            <p className="text-xs leading-relaxed text-on-surface-variant font-semibold">
-              Our analyzer parsed your recent mood parameters and sleep logs:
-            </p>
-            
-            <div className="bg-surface-container-lowest/80 backdrop-blur-sm border border-outline-variant/15 p-4 rounded-lg">
-              <p className="text-xs leading-relaxed text-on-surface font-semibold">
-                "{getAIRecommendations()}"
-              </p>
+            <div className="space-y-3">
+              <div className="flex justify-between items-end">
+                <div>
+                  <h4 className="text-xs font-bold text-on-surface">Level {profile.level}</h4>
+                  <p className="text-[10px] text-on-surface-variant font-medium">{profile.xp} Total XP</p>
+                </div>
+                <span className="text-[10px] text-on-surface-variant font-bold">{currentLevelXp}/200 XP to Level {profile.level + 1}</span>
+              </div>
+              <div className="w-full bg-surface-container border border-outline-variant/15 h-2 rounded-[4px] overflow-hidden">
+                <div className="bg-primary h-full transition-all duration-500" style={{ width: `${progressPercent}%` }} />
+              </div>
             </div>
-          </div>
 
-          <div className="mt-6 pt-4 border-t border-outline-variant/10 text-[10px] text-on-surface-variant font-bold relative z-10">
-            {trendAlert.isAnomaly ? (
-              <span className="text-error flex items-center gap-1">
-                <span className="material-symbols-outlined text-[14px]">warning</span>
-                Anomalous patterns registered.
-              </span>
-            ) : (
-              <span className="text-secondary flex items-center gap-1">
-                <span className="material-symbols-outlined text-[14px]">check_circle</span>
-                All metrics are within stable levels.
-              </span>
-            )}
-          </div>
-          
-          <div 
-            className="absolute -right-8 -bottom-8 w-24 h-24 bg-primary/5 blur-xl group-hover:scale-105 transition-transform duration-500 pointer-events-none"
-            style={{ borderRadius: '50%' }}
-          ></div>
-        </section>
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <div className="border border-outline-variant/15 p-2.5 rounded-[4px] bg-surface/30 flex items-center gap-2">
+                <span className="material-symbols-outlined text-orange-500 text-[20px] select-none">local_fire_department</span>
+                <div>
+                  <span className="text-sm font-display font-extrabold text-on-surface block leading-none">{profile.streak}</span>
+                  <span className="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider">Day Streak</span>
+                </div>
+              </div>
+              <div className="border border-outline-variant/15 p-2.5 rounded-[4px] bg-surface/30 flex items-center gap-2">
+                <span className="material-symbols-outlined text-secondary text-[20px] select-none">workspace_premium</span>
+                <div>
+                  <span className="text-sm font-display font-extrabold text-on-surface block leading-none">{badges.filter(b => b.earned).length}</span>
+                  <span className="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider">Badges</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* AI Recommendations summary */}
+          <section className="bg-surface-container border border-outline-variant/20 rounded-[4px] p-5 shadow-sm flex-1 flex flex-col justify-between relative overflow-hidden group">
+            <div className="relative z-10 space-y-4">
+              <div className="inline-flex items-center gap-1.5 bg-primary/10 text-primary px-2.5 py-1 rounded-[4px] text-[10px] font-bold uppercase tracking-wider">
+                <span className="material-symbols-outlined text-[14px]">auto_awesome</span>
+                <span>AI Clinical Summary</span>
+              </div>
+              
+              <p className="text-xs leading-relaxed text-on-surface-variant font-semibold">
+                Our analyzer parsed your recent mood parameters and sleep logs:
+              </p>
+              
+              <div className="bg-surface-container-lowest/80 backdrop-blur-sm border border-outline-variant/15 p-4 rounded-[4px]">
+                <p className="text-xs leading-relaxed text-on-surface font-semibold">
+                  "{getAIRecommendations()}"
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-outline-variant/10 text-[10px] text-on-surface-variant font-bold relative z-10">
+              {trendAlert.isAnomaly ? (
+                <span className="text-error flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[14px]">warning</span>
+                  Anomalous patterns registered.
+                </span>
+              ) : (
+                <span className="text-secondary flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[14px]">check_circle</span>
+                  All metrics are within stable levels.
+                </span>
+              )}
+            </div>
+            
+            <div 
+              className="absolute -right-8 -bottom-8 w-24 h-24 bg-primary/5 blur-xl group-hover:scale-105 transition-transform duration-500 pointer-events-none"
+              style={{ borderRadius: '50%' }}
+            ></div>
+          </section>
+        </div>
 
       </div>
     </div>
   );
 }
+

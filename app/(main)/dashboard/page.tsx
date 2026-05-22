@@ -29,15 +29,6 @@ export default function DashboardPage() {
     ? getStressStatus(lastCheckin.stressLevel || 3)
     : { text: 'No Logs', color: 'text-on-surface-variant', percent: 0 };
 
-  // Calculate average sleep and focus from last 5 checkins
-  const recentCheckins = checkins.slice(0, 5);
-  const avgSleep = recentCheckins.length > 0
-    ? (recentCheckins.reduce((acc, c) => acc + c.sleepHours, 0) / recentCheckins.length).toFixed(1)
-    : '7.0';
-  const avgFocus = recentCheckins.length > 0
-    ? (recentCheckins.reduce((acc, c) => acc + c.focusScore, 0) / recentCheckins.length).toFixed(1)
-    : '7.0';
-
   // Format time since last checkin
   const getTimeSinceLastCheckin = () => {
     if (!lastCheckin) return 'Never checked in';
@@ -77,7 +68,7 @@ export default function DashboardPage() {
         </div>
         <Link 
           href="/mood" 
-          className="inline-flex items-center justify-center bg-primary text-on-primary hover:bg-primary/90 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-sm shrink-0 w-fit"
+          className="inline-flex items-center justify-center bg-primary text-on-primary hover:bg-primary/90 px-5 py-2.5 rounded-[4px] text-sm font-semibold transition-all shadow-sm shrink-0 w-fit"
         >
           <span className="material-symbols-outlined text-[20px] mr-2">add</span>
           New Mood Entry
@@ -87,12 +78,12 @@ export default function DashboardPage() {
       {/* Overview Grid */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Mood Summary Card */}
-        <div className="lg:col-span-2 bg-gradient-to-br from-primary-container/20 to-primary/10 border border-primary-container/20 rounded-lg p-6 flex flex-col justify-between relative overflow-hidden group">
+        <div className="lg:col-span-2 bg-gradient-to-br from-primary-container/20 to-primary/10 border border-primary-container/20 rounded-[4px] p-6 flex flex-col justify-between relative overflow-hidden group">
           <div className="relative z-10">
             <div className="flex items-center gap-4 mb-6">
               <div 
                 className="bg-background/80 backdrop-blur-md w-14 h-14 flex items-center justify-center text-3xl shadow-sm border border-outline-variant/10"
-                style={{ borderRadius: '50%' }}
+                style={{ borderRadius: '4px' }}
               >
                 {moodDetails.emoji}
               </div>
@@ -110,7 +101,7 @@ export default function DashboardPage() {
               <p className="text-sm leading-relaxed text-on-surface-variant font-medium max-w-lg">
                 {lastCheckin 
                   ? `"${lastCheckin.note || 'No notes written for this entry.'}"`
-                  : "Keep track of anxiety, stress, focus, and sleep patterns. Logging your emotional state daily allows us to build personalized wellness suggestions for you."}
+                  : "Keep track of anxiety, stress, and habits. Logging your emotional state daily allows us to build personalized wellness suggestions for you."}
               </p>
               
               {lastCheckin && lastCheckin.tags.length > 0 && (
@@ -118,7 +109,7 @@ export default function DashboardPage() {
                   {lastCheckin.tags.map(tag => (
                     <span 
                       key={tag} 
-                      className="px-2.5 py-1 bg-primary/5 text-primary text-xs font-bold rounded-lg border border-primary/10"
+                      className="px-2.5 py-1 bg-primary/5 text-primary text-xs font-bold rounded-[4px] border border-primary/10"
                     >
                       {tag}
                     </span>
@@ -141,53 +132,53 @@ export default function DashboardPage() {
           {/* Calm background aesthetic blobs */}
           <div 
             className="absolute -right-8 -top-8 w-32 h-32 bg-primary/5 blur-2xl group-hover:scale-110 transition-transform duration-700 pointer-events-none"
-            style={{ borderRadius: '50%' }}
+            style={{ borderRadius: '4px' }}
           ></div>
           <div 
             className="absolute -right-4 -bottom-4 w-24 h-24 bg-secondary/5 blur-xl group-hover:translate-x-1 transition-transform duration-500 pointer-events-none"
-            style={{ borderRadius: '50%' }}
+            style={{ borderRadius: '4px' }}
           ></div>
         </div>
 
         {/* Quick Access Bar */}
-        <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-6 shadow-sm flex flex-col gap-4">
+        <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-6 shadow-sm flex flex-col gap-4">
           <h3 className="text-base font-display font-bold text-on-surface">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-3 flex-1">
             <Link 
               href="/chat" 
-              className="flex flex-col items-start gap-2.5 p-3.5 bg-surface hover:bg-surface-container-high transition-colors rounded-lg border border-outline-variant/15 group"
+              className="flex flex-col items-start gap-2.5 p-3.5 bg-surface hover:bg-surface-container-high transition-colors rounded-[4px] border border-outline-variant/15 group"
             >
-              <span className="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg group-hover:scale-105 transition-transform">
+              <span className="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-[4px] group-hover:scale-105 transition-transform">
                 chat_bubble
               </span>
               <span className="text-xs font-bold text-on-surface">AI Chat</span>
             </Link>
             <Link 
               href="/relief" 
-              className="flex flex-col items-start gap-2.5 p-3.5 bg-surface hover:bg-surface-container-high transition-colors rounded-lg border border-outline-variant/15 group"
+              className="flex flex-col items-start gap-2.5 p-3.5 bg-surface hover:bg-surface-container-high transition-colors rounded-[4px] border border-outline-variant/15 group"
             >
-              <span className="material-symbols-outlined text-secondary bg-secondary/10 p-2 rounded-lg group-hover:scale-105 transition-transform">
+              <span className="material-symbols-outlined text-secondary bg-secondary/10 p-2 rounded-[4px] group-hover:scale-105 transition-transform">
                 air
               </span>
               <span className="text-xs font-bold text-on-surface">Breathing</span>
             </Link>
             <Link 
               href="/relief" 
-              className="flex flex-col items-start gap-2.5 p-3.5 bg-surface hover:bg-surface-container-high transition-colors rounded-lg border border-outline-variant/15 group"
+              className="flex flex-col items-start gap-2.5 p-3.5 bg-surface hover:bg-surface-container-high transition-colors rounded-[4px] border border-outline-variant/15 group"
             >
-              <span className="material-symbols-outlined text-tertiary bg-tertiary/10 p-2 rounded-lg group-hover:scale-105 transition-transform">
+              <span className="material-symbols-outlined text-tertiary bg-tertiary/10 p-2 rounded-[4px] group-hover:scale-105 transition-transform">
                 videogame_asset
               </span>
               <span className="text-xs font-bold text-on-surface">Mini Games</span>
             </Link>
             <Link 
-              href="/community" 
-              className="flex flex-col items-start gap-2.5 p-3.5 bg-surface hover:bg-surface-container-high transition-colors rounded-lg border border-outline-variant/15 group"
+              href="/mood" 
+              className="flex flex-col items-start gap-2.5 p-3.5 bg-surface hover:bg-surface-container-high transition-colors rounded-[4px] border border-outline-variant/15 group"
             >
-              <span className="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg group-hover:scale-105 transition-transform">
-                forum
+              <span className="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-[4px] group-hover:scale-105 transition-transform">
+                spa
               </span>
-              <span className="text-xs font-bold text-on-surface">Community</span>
+              <span className="text-xs font-bold text-on-surface">Mood Logs</span>
             </Link>
           </div>
         </div>
@@ -196,9 +187,9 @@ export default function DashboardPage() {
       {/* Wellness Outlook Section */}
       <section className="space-y-4">
         <h2 className="text-lg font-display font-bold text-on-surface">Wellness Outlook</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {/* Stress level gauge */}
-          <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-5 shadow-sm flex flex-col items-center justify-center text-center">
+          <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-5 shadow-sm flex flex-col items-center justify-center text-center">
             <span className="text-xs font-bold text-on-surface-variant mb-3">Stress Index</span>
             <div className="relative w-28 h-28 mb-3 flex items-center justify-center">
               <svg className="w-full h-full transform -rotate-90">
@@ -237,7 +228,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Daily Streak widget */}
-          <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-5 shadow-sm flex flex-col justify-between">
+          <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-5 shadow-sm flex flex-col justify-between">
             <div className="flex justify-between items-start">
               <span className="text-xs font-bold text-on-surface-variant">Daily Streak</span>
               <span className="material-symbols-outlined text-orange-500 fill-current animate-pulse">
@@ -252,7 +243,7 @@ export default function DashboardPage() {
               {[...Array(7)].map((_, i) => (
                 <div 
                   key={i} 
-                  className={`h-2 flex-1 rounded-sm ${
+                  className={`h-2 flex-1 rounded-[2px] ${
                     i < (profile.streak % 7 || 7) ? 'bg-primary' : 'bg-surface-container-high'
                   }`}
                 ></div>
@@ -260,72 +251,16 @@ export default function DashboardPage() {
             </div>
             <p className="text-[11px] text-on-surface-variant font-semibold">Keep it up! Next reward at 7 days.</p>
           </div>
-
-          {/* Sleep Widget */}
-          <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-5 shadow-sm flex flex-col justify-between">
-            <div className="flex justify-between items-start mb-2">
-              <span className="material-symbols-outlined text-primary bg-primary/5 p-1.5 rounded-lg text-[20px]">
-                bedtime
-              </span>
-              <span className="text-xs font-bold text-secondary flex items-center">
-                <span className="material-symbols-outlined text-[14px] mr-0.5">trending_up</span>
-                Avg
-              </span>
-            </div>
-            <div>
-              <span className="text-xs font-bold text-on-surface-variant block">Sleep Quality</span>
-              <span className="text-xl font-display font-extrabold text-on-surface mt-0.5 block">
-                {avgSleep} hrs
-              </span>
-            </div>
-            <div className="mt-3">
-              <div className="h-1.5 bg-surface-container-high rounded-sm overflow-hidden">
-                <div 
-                  className="h-full bg-primary transition-all" 
-                  style={{ width: `${Math.min(100, (parseFloat(avgSleep) / 8) * 100)}%` }}
-                ></div>
-              </div>
-            </div>
-            <p className="text-[11px] text-on-surface-variant font-semibold mt-1">Recommended: 7-9 hours</p>
-          </div>
-
-          {/* Focus Widget */}
-          <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-5 shadow-sm flex flex-col justify-between">
-            <div className="flex justify-between items-start mb-2">
-              <span className="material-symbols-outlined text-tertiary bg-tertiary/5 p-1.5 rounded-lg text-[20px]">
-                timer
-              </span>
-              <span className="text-xs font-bold text-tertiary flex items-center">
-                <span className="material-symbols-outlined text-[14px] mr-0.5">insights</span>
-                Avg
-              </span>
-            </div>
-            <div>
-              <span className="text-xs font-bold text-on-surface-variant block">Focus Rating</span>
-              <span className="text-xl font-display font-extrabold text-on-surface mt-0.5 block">
-                {avgFocus}/10
-              </span>
-            </div>
-            <div className="mt-3">
-              <div className="h-1.5 bg-surface-container-high rounded-sm overflow-hidden">
-                <div 
-                  className="h-full bg-tertiary transition-all" 
-                  style={{ width: `${parseFloat(avgFocus) * 10}%` }}
-                ></div>
-              </div>
-            </div>
-            <p className="text-[11px] text-on-surface-variant font-semibold mt-1">Target score: 8.0 or higher</p>
-          </div>
         </div>
       </section>
 
       {/* Quests and Recommendations Section */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Quest Check-ins */}
-        <div className="lg:col-span-2 bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-6 shadow-sm">
+        <div className="lg:col-span-2 bg-surface-container-lowest border border-outline-variant/20 rounded-[4px] p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-display font-bold text-on-surface">Daily Quests</h3>
-            <span className="text-xs font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-lg">
+            <span className="text-xs font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-[4px]">
               Earn XP & Level Up
             </span>
           </div>
@@ -337,7 +272,7 @@ export default function DashboardPage() {
               >
                 <button 
                   onClick={() => toggleChallenge(quest.id)}
-                  className={`w-5 h-5 border rounded flex items-center justify-center mt-0.5 transition-all select-none ${
+                  className={`w-5 h-5 border rounded-[4px] flex items-center justify-center mt-0.5 transition-all select-none ${
                     quest.completed 
                       ? 'bg-primary border-primary text-on-primary' 
                       : 'border-outline hover:border-primary bg-transparent'
@@ -363,9 +298,9 @@ export default function DashboardPage() {
         </div>
 
         {/* Personalized recommendations */}
-        <div className="bg-surface-container border border-outline-variant/20 rounded-lg p-6 flex flex-col justify-between group overflow-hidden relative">
+        <div className="bg-surface-container border border-outline-variant/20 rounded-[4px] p-6 flex flex-col justify-between group overflow-hidden relative">
           <div className="relative z-10 space-y-4">
-            <div className="inline-flex items-center gap-1.5 bg-primary/10 text-primary px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center gap-1.5 bg-primary/10 text-primary px-2.5 py-1 rounded-[4px] text-[10px] font-bold uppercase tracking-wider">
               <span className="material-symbols-outlined text-[14px]">lightbulb</span>
               <span>Recommender</span>
             </div>
@@ -384,7 +319,7 @@ export default function DashboardPage() {
           <div className="mt-6 relative z-10">
             <Link 
               href="/relief" 
-              className="w-full inline-flex items-center justify-center bg-primary text-on-primary hover:bg-primary/90 py-2.5 rounded-lg text-xs font-bold transition-all shadow-md shadow-primary/15"
+              className="w-full inline-flex items-center justify-center bg-primary text-on-primary hover:bg-primary/90 py-2.5 rounded-[4px] text-xs font-bold transition-all shadow-md shadow-primary/15"
             >
               <span className="material-symbols-outlined text-[16px] mr-1.5">play_arrow</span>
               Start Breathing Guide
@@ -394,7 +329,7 @@ export default function DashboardPage() {
           {/* Aesthetic graphic backing */}
           <div 
             className="absolute -right-6 -bottom-6 w-24 h-24 bg-primary/5 blur-xl group-hover:scale-105 transition-transform duration-500 pointer-events-none"
-            style={{ borderRadius: '50%' }}
+            style={{ borderRadius: '4px' }}
           ></div>
         </div>
       </section>
